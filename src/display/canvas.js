@@ -1764,18 +1764,27 @@ class CanvasGraphics {
           current.updatePathMinMax(ctx.mozCurrentTransform, x, y);
           current.updatePathMinMax(ctx.mozCurrentTransform, xw, yh);
           ctx.closePath();
+
+          window.snapX.push(x);
+          window.snapY.push(y)
+          window.snapX.push(xw);
+          window.snapY.push(yh)
           break;
         case OPS.moveTo:
           x = args[j++];
           y = args[j++];
           ctx.moveTo(x, y);
           current.updatePathMinMax(ctx.mozCurrentTransform, x, y);
+          window.snapX.push(x);
+          window.snapY.push(y)
           break;
         case OPS.lineTo:
           x = args[j++];
           y = args[j++];
           ctx.lineTo(x, y);
           current.updatePathMinMax(ctx.mozCurrentTransform, x, y);
+          window.snapX.push(x);
+          window.snapY.push(y)
           break;
         case OPS.curveTo:
           startX = x;

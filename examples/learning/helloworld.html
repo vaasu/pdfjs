@@ -3,27 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <title>'Hello, world!' example</title>
+
+
+  <script>
+    const logSnaps = () => {
+      console.log(snapX);
+      console.log(snapY);
+      const ctx = drawingContext;
+      let i = 0;
+      for(i = 0; i < snapX.length; i++ ){
+        ctx.beginPath();
+        ctx.rect(snapX[i], snapY[i], 10, 10)
+        ctx.strokeStyle = 'green';
+        ctx.stroke();
+      }
+    }
+
+    function onMouseMove(evt) {
+      const rect = drawing.getBoundingClientRect();
+      const x =  (evt.clientX - rect.left) / (rect.right - rect.left) * drawing.width;
+      const y = (evt.clientY - rect.top) / (rect.bottom - rect.top) * drawing.height
+      const {canSnap, sx, sy} = checkSnap(x, y);
+      if(canSnap) {
+        drawingContext.beginPath();
+        drawingContext.strokeStyle = 'red';
+        drawingContext.rect(sx, sy, 10, 10)
+        drawingContext.stroke();
+
+      }
+    }
+
+    function checkSnap(x, y) {
+      for(i=0; i < snapX.length; i++){
+        if(Math.abs(snapX[i] - x) < 20 && Math.abs(snapY[i] - y) < 20) return {canSnap: true, sx: snapX[i], sy: snapY[i]};
+      }
+      return {canSnap: false};
+    }
+
+  </script>
+
 </head>
 <body>
 
 <h1>'Hello, world!' example</h1>
+<button onclick="logSnaps()">Log Snaps</button>
 
 <canvas id="the-canvas" style="border: 1px solid black; direction: ltr;"></canvas>
 
-<script src="../../node_modules/pdfjs-dist/build/pdf.js"></script>
+<!-- <script src="../../node_modules/pdfjs-dist/build/pdf.js"></script> -->
+<script src="../../build/generic/build/pdf.js"></script>
 
 <script id="script">
+  var snapX = [];
+  var snapY = [];
+  var drawing = document.getElementById("the-canvas");
+  var drawingContext = drawing.getContext('2d');
+  drawing.addEventListener('mousemove', onMouseMove, false);
+
   //
   // If absolute URL from the remote server is provided, configure the CORS
   // header on that server.
   //
-  const url = './helloworld.pdf';
+  const url = './measure.pdf';
 
   //
   // The workerSrc property shall be specified.
   //
   pdfjsLib.GlobalWorkerOptions.workerSrc =
-    '../../node_modules/pdfjs-dist/build/pdf.worker.js';
+    '../../build/generic/build/pdf.worker.js';
+    //'../../node_modules/pdfjs-dist/build/pdf.worker.js';
+
+
 
   //
   // Asynchronous download PDF
@@ -51,8 +101,8 @@
     canvas.style.width = Math.floor(viewport.width) + "px";
     canvas.style.height = Math.floor(viewport.height) + "px";
 
-    const transform = outputScale !== 1 
-      ? [outputScale, 0, 0, outputScale, 0, 0] 
+    const transform = outputScale !== 1
+      ? [outputScale, 0, 0, outputScale, 0, 0]
       : null;
 
     //
