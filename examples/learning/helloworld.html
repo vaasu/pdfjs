@@ -6,6 +6,8 @@
 
   <script>
     const showSnaps = () => {
+      window.globalcontext.transform(window.transform);
+      window.globalcontext.transform(...window.viewport.transform);
       const points = MeasureTool.getPoints();
       console.log('Poitns are ', points);
       const ctx = drawingContext;
@@ -83,7 +85,7 @@
     // Fetch the first page
     //
     const page = await pdf.getPage(1);
-    const scale = 1.0;
+    const scale = 1;
     const viewport = page.getViewport({ scale });
     // Support HiDPI-screens.
     const outputScale = window.devicePixelRatio || 1;
@@ -93,6 +95,8 @@
     //
     const canvas = document.getElementById("the-canvas");
     const context = canvas.getContext("2d");
+    window.globalcontext = context;
+    window.viewport = viewport;
 
     canvas.width = Math.floor(viewport.width * outputScale);
     canvas.height = Math.floor(viewport.height * outputScale);
@@ -103,21 +107,30 @@
       ? [outputScale, 0, 0, outputScale, 0, 0]
       : null;
 
+    window.transform = transform;
+
     //
     // Render PDF page into canvas context
     //
+    //viewport.transform = null;
     const renderContext = {
       canvasContext: context,
       transform,
       viewport,
     };
 
-    const caller = async () => {
+    async function caller() {
       await page.render(renderContext);
-      console.log('page rendered');
     }
 
+
     caller();
+
+    /*
+    context.setTransform(transform);
+    context.transform(viewport.transform);
+    */
+    console.log('Rendering completed');
 
   })();
 </script>

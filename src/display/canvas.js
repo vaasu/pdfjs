@@ -1224,7 +1224,6 @@ class CanvasGraphics {
       fnId = fnArray[i];
 
       if (fnId !== OPS.dependency) {
-        console.log('Applying ' + fnId + ' to ', argsArray[i]);
         this[fnId].apply(this, argsArray[i]);
       } else {
         for (const depObjId of argsArray[i]) {
