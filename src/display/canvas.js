@@ -1261,6 +1261,7 @@ class CanvasGraphics {
   }
 
   endDrawing() {
+    showSnaps();
     // Finishing all opened operations such as SMask group painting.
     while (this.stateStack.length || this.inSMaskMode) {
       this.restore();
