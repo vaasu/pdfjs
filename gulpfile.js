@@ -1947,6 +1947,19 @@ gulp.task(
 );
 
 gulp.task(
+  "serve",
+  function createServer2() {
+    console.log();
+    console.log("### Starting local server");
+
+    const WebServer = require("./test/webserver.js").WebServer;
+    const server = new WebServer();
+    server.port = 8888;
+    server.start();
+  }
+)
+
+gulp.task(
   "server",
   gulp.parallel(
     function watchDevCSS() {
