@@ -1224,6 +1224,7 @@ class CanvasGraphics {
       fnId = fnArray[i];
 
       if (fnId !== OPS.dependency) {
+        console.log('Applying ' + fnId + ' to ', argsArray[i]);
         this[fnId].apply(this, argsArray[i]);
       } else {
         for (const depObjId of argsArray[i]) {
@@ -1765,26 +1766,22 @@ class CanvasGraphics {
           current.updatePathMinMax(ctx.mozCurrentTransform, xw, yh);
           ctx.closePath();
 
-          window.snapX.push(x);
-          window.snapY.push(y)
-          window.snapX.push(xw);
-          window.snapY.push(yh)
+          MeasureTool.addSnap('rectangle_start', x, y);
+          MeasureTool.addSnap('rectangle_end', xw, yh);
           break;
         case OPS.moveTo:
           x = args[j++];
           y = args[j++];
           ctx.moveTo(x, y);
+          MeasureTool.addSnap('moveTo', x, y);
           current.updatePathMinMax(ctx.mozCurrentTransform, x, y);
-          window.snapX.push(x);
-          window.snapY.push(y)
           break;
         case OPS.lineTo:
           x = args[j++];
           y = args[j++];
           ctx.lineTo(x, y);
+          MeasureTool.addSnap('lineTo', x, y);
           current.updatePathMinMax(ctx.mozCurrentTransform, x, y);
-          window.snapX.push(x);
-          window.snapY.push(y)
           break;
         case OPS.curveTo:
           startX = x;
