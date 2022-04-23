@@ -8,6 +8,7 @@ class MeasureToolClass {
   }
 
   addSnap(tag, x, y) {
+    if(this.points.length > 100) return;
     this.points.push({tag: tag, x: x, y: y});
   }
 
@@ -24,7 +25,7 @@ class MeasureToolClass {
     const tx = a * mousex  + c * mousey;
     const ty  = b * mousex + d * mousey;
     console.log('Checking', mousex, mousey, tx, ty);
-    for(let i = 0; i < this.points.length; i = i+50){
+    for(let i = 0; i < this.points.length; i++){
       if( Math.abs(this.points[i].x - tx) < delta
        && Math.abs(this.points[i].y - ty) < delta) return {canSnap: true, point: this.points[i]};
     }
