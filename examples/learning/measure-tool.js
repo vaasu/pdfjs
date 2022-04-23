@@ -23,7 +23,8 @@ class MeasureToolClass {
     // Transformed x and y
     const tx = a * mousex  + c * mousey;
     const ty  = b * mousex + d * mousey;
-    for(let i = 0; i < this.points.length; i++){
+    console.log('Checking', mousex, mousey, tx, ty);
+    for(let i = 0; i < this.points.length; i = i+50){
       if( Math.abs(this.points[i].x - tx) < delta
        && Math.abs(this.points[i].y - ty) < delta) return {canSnap: true, point: this.points[i]};
     }
