@@ -85,7 +85,7 @@
     {url: './riverine.pdf', page: 8},
   ];
 
-  const doc = docs[2];
+  const doc = docs[3];
   //
   // The workerSrc property shall be specified.
   //
@@ -165,6 +165,25 @@
       MeasureTool.addOp('rotate', {r});
       //MeasureTool.transform({a,b,c,d,e,f});
       savedRotate.call(context, r);
+    }
+
+
+    const savedRestore = context.restore;
+    context.restore = () =>  {
+      debugger;
+      MeasureTool.addOp('restore', {});
+      savedRestore.call(context);
+      const {a,b,c,d,e,f} = context.getTransform();
+      MeasureTool.setTransform({a,b,c,d,e,f});
+    }
+
+    const savedResetTransform = context.resetTransform;
+    context.resetTransform = () =>  {
+      debugger;
+      MeasureTool.addOp('resetTransform', {});
+      savedResetTransform.call(context);
+      const {a,b,c,d,e,f} = context.getTransform();
+      MeasureTool.setTransform({a,b,c,d,e,f});
     }
 
 
