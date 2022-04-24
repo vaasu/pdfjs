@@ -5,13 +5,15 @@
   <title>Snap example</title>
 
   <script>
+    lastCalled = 0;
     const showSnaps = () => {
       //window.globalcontext.transform(window.transform);
       //window.globalcontext.transform(...window.viewport.transform);
       const [a,b,c,d,e,f] = MeasureTool.getTransform();
-      window.globalcontext.setTransform(a,b,c,d,e,f);
+      const ctx = MeasureTool.getContext();
+      ctx.setTransform(a,b,c,d,e,f);
       const points = MeasureTool.getPoints();
-      const ctx = drawingContext;
+      console.log('Points are ', points);
       let i = 0;
       for(i = 0; i < points.length; i++ ){
         ctx.beginPath();
@@ -22,19 +24,32 @@
     }
 
     function onMouseMove(evt) {
+      /*
+      if(Date.now() - lastCalled < 1000) return;
+      lastCalled = Date.now();
+      */
       const sp = document.getElementById('mousexy');
       const rect = drawing.getBoundingClientRect();
       const x =  (evt.clientX - rect.left) / (rect.right - rect.left) * drawing.width;
       const y = (evt.clientY - rect.top) / (rect.bottom - rect.top) * drawing.height;
-      sp.innerHTML = `Mouse X: ${x.toFixed(2)} Y: ${y.toFixed(2)}`;
-      const {canSnap, point} = MeasureTool.checkSnap(x, y);
+      const {canSnap, snap, transformed } = MeasureTool.checkSnap(x, y);
+
+      sp.innerHTML = `Mouse: ${x.toFixed(2)}, ${y.toFixed(2)} <br />`;
+      sp.innerHTML += `Inverse Transformed: ${transformed.x.toFixed(2)}, ${transformed.y.toFixed(2)} <br />`;
+
       if(canSnap) {
-        drawingContext.beginPath();
-        drawingContext.strokeStyle = 'red';
-        drawingContext.rect(point.x - 7 , point.y - 7, 13, 13)
-        drawingContext.stroke();
-        console.log('Snapped event ', evt);
+        const ctx = MeasureTool.getContext();
+        ctx.beginPath();
+        ctx.strokeStyle = 'red';
+        ctx.rect(snap.x - 7 , snap.y - 7, 13, 13)
+        ctx.stroke();
+        sp.innerHTML += `Snapped: ${snap.x.toFixed(2)}, ${snap.y.toFixed(2)} <br />`;
       }
+      else {
+        sp.innerHTML += `Snapped: None`;
+      }
+
+
     }
 
   </script>
@@ -44,7 +59,7 @@
 
 <h1>Testing snaps</h1>
 <button onclick="showSnaps()">Show Snaps</button>
-<span id="mousexy"></span>
+<div id="mousexy" style="position: fixed; left: 10px; top: 10px; background-color: white; border: solid 1px black"></div>
 <br />
 
 <canvas id="the-canvas" style="border: 1px solid red; direction: ltr; cursor: crosshair"></canvas>
@@ -54,19 +69,19 @@
 <script src="../../build/generic/build/pdf.js"></script>
 
 <script id="script">
-  console.log(MeasureTool);
-  var snapX = [];
-  var snapY = [];
   var drawing = document.getElementById("the-canvas");
   var drawingContext = drawing.getContext('2d');
   drawing.addEventListener('mousemove', onMouseMove, false);
 
-  //
-  // If absolute URL from the remote server is provided, configure the CORS
-  // header on that server.
-  //
-  const url = './snap_linetext.pdf';
+  const docs = [
+    {url: './snap_line.pdf', page: 1},
+    {url: './snap_linetext.pdf', page: 1},
+    {url: './measure.pdf', page: 1},
+    {url: './coral.pdf', page: 5},
+    {url: './riverine.pdf', page: 8},
+  ];
 
+  const doc = docs[3];
   //
   // The workerSrc property shall be specified.
   //
@@ -79,13 +94,13 @@
   //
   // Asynchronous download PDF
   //
-  const loadingTask = pdfjsLib.getDocument(url);
+  const loadingTask = pdfjsLib.getDocument(doc.url);
   (async () => {
     const pdf = await loadingTask.promise;
     //
     // Fetch the first page
     //
-    const page = await pdf.getPage(1);
+    const page = await pdf.getPage(doc.page);
     const scale = 1;
     const viewport = page.getViewport({ scale });
     // Support HiDPI-screens.
@@ -96,8 +111,7 @@
     //
     const canvas = document.getElementById("the-canvas");
     const context = canvas.getContext("2d");
-    window.globalcontext = context;
-    window.viewport = viewport;
+    MeasureTool.setContext(context);
 
     canvas.width = Math.floor(viewport.width * outputScale);
     canvas.height = Math.floor(viewport.height * outputScale);
@@ -108,7 +122,6 @@
       ? [outputScale, 0, 0, outputScale, 0, 0]
       : null;
 
-    window.transform = transform;
 
     //
     // Render PDF page into canvas context
