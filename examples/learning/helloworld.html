@@ -9,9 +9,9 @@
     const showSnaps = () => {
       //window.globalcontext.transform(window.transform);
       //window.globalcontext.transform(...window.viewport.transform);
-      const [a,b,c,d,e,f] = MeasureTool.getTransform();
+      //const [a,b,c,d,e,f] = MeasureTool.getTransform();
       const ctx = MeasureTool.getContext();
-      ctx.setTransform(a,b,c,d,e,f);
+      //ctx.setTransform(a,b,c,d,e,f);
       const points = MeasureTool.getPoints();
       const ops = MeasureTool.getOps();
       console.log('Points are ', points);
@@ -116,6 +116,8 @@
     const canvas = document.getElementById("the-canvas");
     const context = canvas.getContext("2d");
 
+    console.log('Initial transform is ', context.getTransform());
+
     const savedMoveTo = context.moveTo;
     context.moveTo = (x, y) =>  {
       MeasureTool.addOp('moveTo', {x, y});
@@ -133,12 +135,14 @@
     const savedSetTransform = context.setTransform;
     context.setTransform = (a,b,c,d,e,f) =>  {
       MeasureTool.addOp('setTransform', {a,b,c,d,e,f});
+      MeasureTool.setTransform({a,b,c,d,e,f});
       savedSetTransform.call(context, a, b,c,d,e,f);
     }
 
     const savedTransform = context.transform;
     context.transform = (a,b,c,d,e,f) =>  {
       MeasureTool.addOp('transform', {a,b,c,d,e,f});
+      MeasureTool.transform({a,b,c,d,e,f});
       savedTransform.call(context, a, b,c,d,e,f);
     }
 

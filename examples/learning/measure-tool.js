@@ -5,6 +5,9 @@ class MeasureToolClass {
   reverseTransform = [];
   ops = [];
 
+  // Default SVG matrix a,b,c,d,e
+  currentMatrix = [1, 0, 0, 1, 0, 0]
+
   constructor(config = {tolerance: 20}) {
     this.config = config;
   }
@@ -13,7 +16,12 @@ class MeasureToolClass {
   addSnap(tag, x, y)
   {
     if(this.LIMIT_SNAPS > 0 && this.points.length > this.LIMIT_SNAPS) return;
-    this.points.push({tag, x, y});
+    const [a,b,c,d,e,f] = this.currentMatrix;
+    // Transformed x and y
+    const tx =  a * x + c * y;
+    const ty  = b * y + d * y;
+
+    this.points.push({tag, x: tx, y:ty});
   }
 
 
@@ -26,10 +34,9 @@ class MeasureToolClass {
     const tx =  a * mousex  + c * mousey;
     const ty  = b * mousex + d * mousey;
 
-
     for(let i = 0; i < this.points.length; i++){
-      if( Math.abs(this.points[i].x - tx) < delta
-       && Math.abs(this.points[i].y - ty) < delta) return {canSnap: true, snap: this.points[i], transformed: {x: tx, y: ty}};
+      if( Math.abs(this.points[i].x - mousex) < delta
+       && Math.abs(this.points[i].y - mousey) < delta) return {canSnap: true, snap: this.points[i], transformed: {x: tx, y: ty}};
     }
     return {canSnap: false, transformed: {x: tx, y: ty}};
   }
@@ -44,6 +51,26 @@ class MeasureToolClass {
       d/(a*d-b*c), b/(b*c-a*d), c/(b*c-a*d), a/(a*d-b*c), (d*e-c*f)/(b*c-a*d), (b*e-a*f)/(a*d-b*c)
     ]
   }
+
+  transform({a,b,c,d,e,f}){
+    // Multiply current and incoming
+    const [a1,b1,c1,d1,e1,f1] = this.currentMatrix;
+    const output = [
+      a * a1 + b * c1,
+      a * b1 + b * d1,
+      a1 * c + c1 * d,
+      b1 * c + d * d1,
+      a1 * e + c1 * f + e1,
+      b1 * e + d1 * f + f1
+    ]
+    this.currentMatrix = output;
+  }
+
+  setTransform({a,b,c,d,e,f}){
+    this.currentTransform = [a,b,c,d,e,f];
+  }
+
+
 
   setContext    = c => this.context = c;
   getTransform  = _ => this.savedTransform;
