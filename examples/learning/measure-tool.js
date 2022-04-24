@@ -7,32 +7,30 @@ class MeasureToolClass {
     this.config = config;
   }
 
-  addSnap(tag, x, y) {
-    if(this.points.length > 100) return;
+  addSnap(tag, x, y)
+  {
+    if(this.points.length > 5) return;
     this.points.push({tag: tag, x: x, y: y});
   }
 
-  getPoints() {
-    return this.points;
-  }
 
-
-  checkSnap(mousex, mousey) {
+  checkSnap(mousex, mousey)
+  {
     const delta = this.config.tolerance;
     const [a,b,c,d,e,f] = this.reverseTransform;
 
     // Transformed x and y
     const tx = a * mousex  + c * mousey;
     const ty  = b * mousex + d * mousey;
-    console.log('Checking', mousex, mousey, tx, ty);
     for(let i = 0; i < this.points.length; i++){
       if( Math.abs(this.points[i].x - tx) < delta
-       && Math.abs(this.points[i].y - ty) < delta) return {canSnap: true, point: this.points[i]};
+       && Math.abs(this.points[i].y - ty) < delta) return {canSnap: true, snap: this.points[i], transformed: {x: tx, y: ty}};
     }
-    return {canSnap: false};
+    return {canSnap: false, transformed: {x: tx, y: ty}};
   }
 
-  saveTransform({a,b,c,d,e,f}) {
+  saveTransform({a,b,c,d,e,f})
+  {
     this.savedTransform = [a,b,c,d,e,f];
 
     // Reverse got from Woframe
@@ -42,9 +40,11 @@ class MeasureToolClass {
     ]
   }
 
-  getTransform() {
-    return this.savedTransform;
-  }
+  setContext    = c => this.context = c;
+  getTransform  = _ => this.savedTransform;
+  getContext    = _ => this.context;
+  getPoints     = _ => this.points;
+
 }
 
 const MeasureTool = new MeasureToolClass()
