@@ -9,7 +9,7 @@ class MeasureToolClass {
 
   addSnap(tag, x, y)
   {
-    if(this.points.length > 5) return;
+    //if(this.points.length > 5) return;
     this.points.push({tag: tag, x: x, y: y});
   }
 
