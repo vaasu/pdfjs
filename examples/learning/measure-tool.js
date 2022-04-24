@@ -67,7 +67,18 @@ class MeasureToolClass {
   }
 
   setTransform({a,b,c,d,e,f}){
-    this.currentTransform = [a,b,c,d,e,f];
+    this.currentMatrix = [a,b,c,d,e,f];
+  }
+
+  scale({x,y}) {
+    //https://www.wolframalpha.com/input?i=matrix+multiplication&assumption=%7B%22F%22%2C+%22MatricesOperations%22%2C+%22theMatrix3%22%7D+-%3E%22%7B%7B1%2C0%2C0%7D%2C%7B0%2C1%2C0%7D%2C%7B0%2C0%2C1%7D%7D%22&assumption=%7B%22F%22%2C+%22MatricesOperations%22%2C+%22theMatrix2%22%7D+-%3E%22%7B%7Bx%2C0%2C0%7D%2C%7B0%2Cy%2C0%7D%2C%7B0%2C0%2C1%7D%7D%22&assumption=%7B%22F%22%2C+%22MatricesOperations%22%2C+%22theMatrix1%22%7D+-%3E%22%7B%7Ba%2Cc%2Ce%7D%2C%7Bb%2Cd%2Cf%7D%2C%7B0%2C0%2C1%7D%7D%22&assumption=%7B%22C%22%2C+%22matrix+multiplication%22%7D+-%3E+%7B%22Calculator%22%7D
+
+    // Multiplies the existing matrix [[a,c,e][b,d,f][0,0,1]] with scaling matrix [[x,0,0][0,y,0][0,0,1]]
+    const [a,b,c,d,e,f] = this.currentMatrix;
+    const output = [
+      a*x, b*x, c*y, d*y, e, f
+    ];
+    this.currentMatrix = output;
   }
 
 
