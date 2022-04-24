@@ -1,16 +1,19 @@
 class MeasureToolClass {
+  LIMIT_SNAPS = 0;
   points = [];
   savedTransform = [];
   reverseTransform = [];
+  ops = [];
 
   constructor(config = {tolerance: 20}) {
     this.config = config;
   }
 
+
   addSnap(tag, x, y)
   {
-    //if(this.points.length > 5) return;
-    this.points.push({tag: tag, x: x, y: y});
+    if(this.LIMIT_SNAPS > 0 && this.points.length > this.LIMIT_SNAPS) return;
+    this.points.push({tag, x, y});
   }
 
 
@@ -20,8 +23,10 @@ class MeasureToolClass {
     const [a,b,c,d,e,f] = this.reverseTransform;
 
     // Transformed x and y
-    const tx = a * mousex  + c * mousey;
+    const tx =  a * mousex  + c * mousey;
     const ty  = b * mousex + d * mousey;
+
+
     for(let i = 0; i < this.points.length; i++){
       if( Math.abs(this.points[i].x - tx) < delta
        && Math.abs(this.points[i].y - ty) < delta) return {canSnap: true, snap: this.points[i], transformed: {x: tx, y: ty}};
@@ -44,6 +49,8 @@ class MeasureToolClass {
   getTransform  = _ => this.savedTransform;
   getContext    = _ => this.context;
   getPoints     = _ => this.points;
+  addOp = (op, args) => this.ops.push({op, args});
+  getOps = _ => this.ops;
 
 }
 

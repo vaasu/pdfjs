@@ -13,13 +13,15 @@
       const ctx = MeasureTool.getContext();
       ctx.setTransform(a,b,c,d,e,f);
       const points = MeasureTool.getPoints();
+      const ops = MeasureTool.getOps();
       console.log('Points are ', points);
+      console.log('Ops are ', ops);
       let i = 0;
       for(i = 0; i < points.length; i++ ){
         ctx.beginPath();
         ctx.rect(points[i].x - 2, points[i].y - 2, 4, 4)
         ctx.strokeStyle = 'green';
-        ctx.lineWidth = 0.4;
+        ctx.lineWidth = 1;
         ctx.stroke();
       }
     }
@@ -79,11 +81,11 @@
     {url: './snap_line.pdf', page: 1},
     {url: './snap_linetext.pdf', page: 1},
     {url: './measure.pdf', page: 1},
-    {url: './coral.pdf', page: 8},
+    {url: './coral.pdf', page: 5},
     {url: './riverine.pdf', page: 8},
   ];
 
-  const doc = docs[3];
+  const doc = docs[0];
   //
   // The workerSrc property shall be specified.
   //
@@ -113,6 +115,35 @@
     //
     const canvas = document.getElementById("the-canvas");
     const context = canvas.getContext("2d");
+
+    const savedMoveTo = context.moveTo;
+    context.moveTo = (x, y) =>  {
+      MeasureTool.addOp('moveTo', {x, y});
+      MeasureTool.addSnap('moveTo', x, y);
+      savedMoveTo.call(context, x, y);
+    }
+
+    const savedLineTo = context.lineTo;
+    context.lineTo= (x, y) =>  {
+      MeasureTool.addOp('lineTo', {x, y});
+      MeasureTool.addSnap('lineTo', x, y);
+      savedLineTo.call(context, x, y);
+    }
+
+    const savedSetTransform = context.setTransform;
+    context.setTransform = (a,b,c,d,e,f) =>  {
+      MeasureTool.addOp('setTransform', {a,b,c,d,e,f});
+      savedSetTransform.call(context, a, b,c,d,e,f);
+    }
+
+    const savedTransform = context.transform;
+    context.transform = (a,b,c,d,e,f) =>  {
+      MeasureTool.addOp('transform', {a,b,c,d,e,f});
+      savedTransform.call(context, a, b,c,d,e,f);
+    }
+
+
+
     MeasureTool.setContext(context);
 
     canvas.width = Math.floor(viewport.width * outputScale);

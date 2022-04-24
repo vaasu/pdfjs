@@ -1767,21 +1767,19 @@ class CanvasGraphics {
           current.updatePathMinMax(ctx.mozCurrentTransform, xw, yh);
           ctx.closePath();
 
-          MeasureTool.addSnap('rectangle_start', x, y);
-          MeasureTool.addSnap('rectangle_end', xw, yh);
           break;
         case OPS.moveTo:
           x = args[j++];
           y = args[j++];
           ctx.moveTo(x, y);
-          MeasureTool.addSnap('moveTo', x, y);
+          //MeasureTool.addSnap('moveTo', x, y);
           current.updatePathMinMax(ctx.mozCurrentTransform, x, y);
           break;
         case OPS.lineTo:
           x = args[j++];
           y = args[j++];
           ctx.lineTo(x, y);
-          MeasureTool.addSnap('lineTo', x, y);
+          //MeasureTool.addSnap('lineTo', x, y);
           current.updatePathMinMax(ctx.mozCurrentTransform, x, y);
           break;
         case OPS.curveTo:
