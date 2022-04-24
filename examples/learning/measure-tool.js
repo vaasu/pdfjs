@@ -1,5 +1,6 @@
 class MeasureToolClass {
   LIMIT_SNAPS = 0;
+  LIMIT_OPS = 0;
   points = [];
   savedTransform = [];
   reverseTransform = [];
@@ -13,15 +14,22 @@ class MeasureToolClass {
   }
 
 
+
+  addOp(op, args)
+  {
+    if(this.LIMIT_OPS > 0 && this.ops.length > this.LIMIT_OPS) return;
+    this.ops.push({op, args});
+  }
+
   addSnap(tag, x, y)
   {
     if(this.LIMIT_SNAPS > 0 && this.points.length > this.LIMIT_SNAPS) return;
     const [a,b,c,d,e,f] = this.currentMatrix;
     // Transformed x and y
-    const tx =  a * x + c * y;
-    const ty  = b * y + d * y;
-
-    this.points.push({tag, x: tx, y:ty});
+    let tx =  a * x + c * y + e;
+    let ty  = b * x + d * y + f;
+    //ty = ty < 0 ? -1 * ty : ty;
+    this.points.push({tag, x: tx, y:ty, matrix:[a,b,c,d,e,f], source: [x,y]});
   }
 
 
@@ -50,6 +58,21 @@ class MeasureToolClass {
     this.reverseTransform = [
       d/(a*d-b*c), b/(b*c-a*d), c/(b*c-a*d), a/(a*d-b*c), (d*e-c*f)/(b*c-a*d), (b*e-a*f)/(a*d-b*c)
     ]
+  }
+
+  transform_new_but_dont_use({a,b,c,d,e,f}){
+    // Multiply incoming x existing in this order
+    // Taken from https://www.wolframalpha.com/input?i=matrix+multiply&assumption=%7B%22F%22%2C+%22MatricesOperations%22%2C+%22theMatrix2%22%7D+-%3E%22%7B%7Ba_2%2Cc_2%2Ce_2%7D%2C%7Bb_2%2Cd_2%2Cf_2%7D%2C%7B0%2C0%2C1%7D%7D%22&assumption=%7B%22F%22%2C+%22MatricesOperations%22%2C+%22theMatrix1%22%7D+-%3E%22%7B%7Ba%2Cc%2Ce%7D%2C%7Bb%2Cd%2Cf%7D%2C%7B0%2C0%2C1%7D%7D%22
+    const [a2,b2,c2,d2,e2,f2] = this.currentMatrix;
+    const output = [
+      a*a2 + b2*c,
+      a2*b + b2*d,
+      a*c2 + c*d2,
+      b*c2 + d*d2,
+      a*e2 + c*f2+e,
+      b*e2 + d*f2+f
+    ]
+    this.currentMatrix = output;
   }
 
   transform({a,b,c,d,e,f}){
@@ -87,8 +110,7 @@ class MeasureToolClass {
   getTransform  = _ => this.savedTransform;
   getContext    = _ => this.context;
   getPoints     = _ => this.points;
-  addOp = (op, args) => this.ops.push({op, args});
-  getOps = _ => this.ops;
+  getOps        = _ => this.ops;
 
 }
 
