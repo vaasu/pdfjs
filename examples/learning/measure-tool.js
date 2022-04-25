@@ -104,9 +104,11 @@ class MeasureToolClass {
     this.currentMatrix = output;
   }
 
+  setContext(context) {
+    this.context = context;
 
+  }
 
-  setContext    = c => this.context = c;
   getTransform  = _ => this.savedTransform;
   getContext    = _ => this.context;
   getPoints     = _ => this.points;

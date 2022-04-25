@@ -96,7 +96,10 @@
     const canvas = document.getElementById("the-canvas");
     const context = canvas.getContext("2d");
 
- const savedMoveTo = context.moveTo;
+    console.log('Setting context');
+    MeasureTool.setContext(context);
+
+    const savedMoveTo = context.moveTo;
     context.moveTo = (x, y) =>  {
       MeasureTool.addOp('moveTo', {x, y});
       MeasureTool.addSnap('moveTo', x, y);
