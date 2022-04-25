@@ -1261,7 +1261,6 @@ class CanvasGraphics {
   }
 
   endDrawing() {
-    MeasureTool.saveTransform(this.ctx.getTransform());
     //showSnaps();
     // Finishing all opened operations such as SMask group painting.
     while (this.stateStack.length || this.inSMaskMode) {
