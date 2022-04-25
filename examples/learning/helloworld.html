@@ -93,32 +93,10 @@
     '../../build/generic/build/pdf.worker.js';
     //'../../node_modules/pdfjs-dist/build/pdf.worker.js';
 
-
-
-  //
-  // Asynchronous download PDF
-  //
-  const loadingTask = pdfjsLib.getDocument(doc.url);
-  (async () => {
-    const pdf = await loadingTask.promise;
-    //
-    // Fetch the first page
-    //
-    const page = await pdf.getPage(doc.page);
-    const scale = 1;
-    const viewport = page.getViewport({ scale });
-    // Support HiDPI-screens.
-    const outputScale = window.devicePixelRatio || 1;
-
-    //
-    // Prepare canvas using PDF page dimensions
-    //
     const canvas = document.getElementById("the-canvas");
     const context = canvas.getContext("2d");
 
-    console.log('Initial transform is ', context.getTransform());
-
-    const savedMoveTo = context.moveTo;
+ const savedMoveTo = context.moveTo;
     context.moveTo = (x, y) =>  {
       MeasureTool.addOp('moveTo', {x, y});
       MeasureTool.addSnap('moveTo', x, y);
@@ -185,6 +163,31 @@
     }
 
 
+  //
+  // Asynchronous download PDF
+  //
+  const loadingTask = pdfjsLib.getDocument(doc.url);
+  (async () => {
+    const pdf = await loadingTask.promise;
+    //
+    // Fetch the first page
+    //
+    const page = await pdf.getPage(doc.page);
+    const scale = 1;
+    const viewport = page.getViewport({ scale });
+    // Support HiDPI-screens.
+    const outputScale = window.devicePixelRatio || 1;
+
+    //
+    // Prepare canvas using PDF page dimensions
+    //
+    const canvas = document.getElementById("the-canvas");
+    const context = canvas.getContext("2d");
+
+    console.log('Initial transform is ', context.getTransform());
+
+
+
     MeasureTool.setContext(context);
 
     canvas.width = Math.floor(viewport.width * outputScale);
@@ -207,12 +210,7 @@
       viewport,
     };
 
-    async function caller() {
-      await page.render(renderContext);
-    }
-
-
-    caller();
+    page.render(renderContext);
 
     /*
     context.setTransform(transform);
