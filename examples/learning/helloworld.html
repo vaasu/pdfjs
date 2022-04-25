@@ -30,9 +30,9 @@
       lastCalled = Date.now();
       */
       const sp = document.getElementById('mousexy');
-      const rect = drawing.getBoundingClientRect();
-      const x =  (evt.clientX - rect.left) / (rect.right - rect.left) * drawing.width;
-      const y = (evt.clientY - rect.top) / (rect.bottom - rect.top) * drawing.height;
+      const rect = canvas.getBoundingClientRect();
+      const x =  (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width;
+      const y = (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height;
       const {canSnap, snap} = MeasureTool.checkSnap(x, y);
 
       sp.innerHTML = `Mouse: ${x.toFixed(2)}, ${y.toFixed(2)} <br />`;
@@ -64,7 +64,7 @@
 <br />
 
 <div id="div-container">
-<canvas id="the-canvas" style="border: 1px solid red; direction: ltr; cursor: crosshair"></canvas>
+  <canvas id="the-canvas" style="border: 1px solid red; direction: ltr; cursor: crosshair"></canvas>
 </div>
 <script src="measure-tool.js"></script>
 
@@ -74,9 +74,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.3.2/dist/panzoom.min.js"></script>
 
 <script id="script">
-  var drawing = document.getElementById("the-canvas");
-  var drawingContext = drawing.getContext('2d');
-  drawing.addEventListener('mousemove', onMouseMove, false);
+  const canvas = document.getElementById("the-canvas");
+  const context = canvas.getContext("2d");
+  canvas.addEventListener('mousemove', onMouseMove, false);
 
   const docs = [
     {url: './snap_line.pdf', page: 1},
@@ -87,18 +87,11 @@
   ];
 
   const doc = docs[3];
-  //
-  // The workerSrc property shall be specified.
-  //
+
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
     //'../../build/generic/build/pdf.worker.js';
-    //'../../node_modules/pdfjs-dist/build/pdf.worker.js';
 
-  const canvas = document.getElementById("the-canvas");
-  const context = canvas.getContext("2d");
-
-  console.log('Setting context');
   const MeasureTool = new MeasureToolClass();
   MeasureTool.setContext(context);
 
@@ -168,18 +161,10 @@
     MeasureTool.setTransform({a,b,c,d,e,f});
   }
 
-
-  //
-  // Asynchronous download PDF
-  //
-  const loadingTask = pdfjsLib.getDocument(doc.url);
-  (async () => {
+  const renderPdf = async (canvas, url, page_no, scale = 1) => {
+    const loadingTask = pdfjsLib.getDocument(url);
     const pdf = await loadingTask.promise;
-    //
-    // Fetch the first page
-    //
-    const page = await pdf.getPage(doc.page);
-    const scale = 1;
+    const page = await pdf.getPage(page_no);
     const viewport = page.getViewport({ scale });
     // Support HiDPI-screens.
     const outputScale = window.devicePixelRatio || 1;
@@ -187,7 +172,7 @@
     //
     // Prepare canvas using PDF page dimensions
     //
-    const canvas = document.getElementById("the-canvas");
+    //const canvas = document.getElementById("the-canvas");
     const context = canvas.getContext("2d");
 
     console.log('Initial transform is ', context.getTransform());
@@ -224,7 +209,9 @@
     */
     console.log('Rendering completed');
 
-  })();
+  };
+
+  renderPdf(canvas, doc.url, doc.page);
 
 
 </script>
