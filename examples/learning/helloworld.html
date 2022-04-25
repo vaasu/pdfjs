@@ -82,7 +82,7 @@
     {url: './snap_linetext.pdf', page: 1},
     {url: './measure.pdf', page: 1},
     {url: './coral.pdf', page: 5},
-    {url: './riverine.pdf', page: 8},
+    {url: './riverine.pdf', page: 5},
   ];
 
   const doc = docs[4];
@@ -97,6 +97,7 @@
     const context = canvas.getContext("2d");
 
     console.log('Setting context');
+    const MeasureTool = new MeasureToolClass();
     MeasureTool.setContext(context);
 
     const savedMoveTo = context.moveTo;

@@ -116,4 +116,4 @@ class MeasureToolClass {
 
 }
 
-const MeasureTool = new MeasureToolClass()
+//const MeasureTool = new MeasureToolClass()
