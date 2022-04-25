@@ -63,12 +63,15 @@
 </div>
 <br />
 
+<div id="div-container">
 <canvas id="the-canvas" style="border: 1px solid red; direction: ltr; cursor: crosshair"></canvas>
+</div>
 <script src="measure-tool.js"></script>
 
 <!-- <script src="../../node_modules/pdfjs-dist/build/pdf.js"></script>-->
 <!-- <script src="../../build/generic/build/pdf.js"></script> -->
 <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.3.2/dist/panzoom.min.js"></script>
 
 <script id="script">
   var drawing = document.getElementById("the-canvas");
@@ -83,7 +86,7 @@
     {url: './riverine.pdf', page: 5},
   ];
 
-  const doc = docs[4];
+  const doc = docs[3];
   //
   // The workerSrc property shall be specified.
   //
@@ -92,78 +95,78 @@
     //'../../build/generic/build/pdf.worker.js';
     //'../../node_modules/pdfjs-dist/build/pdf.worker.js';
 
-    const canvas = document.getElementById("the-canvas");
-    const context = canvas.getContext("2d");
+  const canvas = document.getElementById("the-canvas");
+  const context = canvas.getContext("2d");
 
-    console.log('Setting context');
-    const MeasureTool = new MeasureToolClass();
-    MeasureTool.setContext(context);
+  console.log('Setting context');
+  const MeasureTool = new MeasureToolClass();
+  MeasureTool.setContext(context);
 
-    const savedMoveTo = context.moveTo;
-    context.moveTo = (x, y) =>  {
-      MeasureTool.addOp('moveTo', {x, y});
-      MeasureTool.addSnap('moveTo', x, y);
-      savedMoveTo.call(context, x, y);
-    }
+  const savedMoveTo = context.moveTo;
+  context.moveTo = (x, y) =>  {
+    MeasureTool.addOp('moveTo', {x, y});
+    MeasureTool.addSnap('moveTo', x, y);
+    savedMoveTo.call(context, x, y);
+  }
 
-    const savedLineTo = context.lineTo;
-    context.lineTo= (x, y) =>  {
-      MeasureTool.addOp('lineTo', {x, y});
-      MeasureTool.addSnap('lineTo', x, y);
-      savedLineTo.call(context, x, y);
-    }
+  const savedLineTo = context.lineTo;
+  context.lineTo= (x, y) =>  {
+    MeasureTool.addOp('lineTo', {x, y});
+    MeasureTool.addSnap('lineTo', x, y);
+    savedLineTo.call(context, x, y);
+  }
 
-    const savedSetTransform = context.setTransform;
-    context.setTransform = (a,b,c,d,e,f) =>  {
-      MeasureTool.addOp('setTransform', {a,b,c,d,e,f});
-      MeasureTool.setTransform({a,b,c,d,e,f});
-      savedSetTransform.call(context, a, b,c,d,e,f);
-    }
+  const savedSetTransform = context.setTransform;
+  context.setTransform = (a,b,c,d,e,f) =>  {
+    MeasureTool.addOp('setTransform', {a,b,c,d,e,f});
+    MeasureTool.setTransform({a,b,c,d,e,f});
+    savedSetTransform.call(context, a, b,c,d,e,f);
+  }
 
-    const savedTransform = context.transform;
-    context.transform = (a,b,c,d,e,f) =>  {
-      MeasureTool.addOp('transform', {a,b,c,d,e,f});
-      MeasureTool.transform({a,b,c,d,e,f});
-      savedTransform.call(context, a, b,c,d,e,f);
-    }
+  const savedTransform = context.transform;
+  context.transform = (a,b,c,d,e,f) =>  {
+    MeasureTool.addOp('transform', {a,b,c,d,e,f});
+    MeasureTool.transform({a,b,c,d,e,f});
+    savedTransform.call(context, a, b,c,d,e,f);
+  }
 
-    const savedTranslate = context.translate;
-    context.translate = (x,y) =>  {
-      MeasureTool.addOp('translate', {x,y});
-      //MeasureTool.transform({a,b,c,d,e,f});
-      savedTranslate.call(context, x,y);
-    }
+  const savedTranslate = context.translate;
+  context.translate = (x,y) =>  {
+    MeasureTool.addOp('translate', {x,y});
+    //MeasureTool.transform({a,b,c,d,e,f});
+    savedTranslate.call(context, x,y);
+  }
 
-    const savedScale = context.scale;
-    context.scale = (x,y) =>  {
-      MeasureTool.addOp('scale', {x,y});
-      MeasureTool.scale({x,y});
-      savedScale.call(context, x,y);
-    }
+  const savedScale = context.scale;
+  context.scale = (x,y) =>  {
+    MeasureTool.addOp('scale', {x,y});
+    MeasureTool.scale({x,y});
+    savedScale.call(context, x,y);
+  }
 
-    const savedRotate = context.rotate;
-    context.rotate = (r) =>  {
-      MeasureTool.addOp('rotate', {r});
-      //MeasureTool.transform({a,b,c,d,e,f});
-      savedRotate.call(context, r);
-    }
+  const savedRotate = context.rotate;
+  context.rotate = (r) =>  {
+    MeasureTool.addOp('rotate', {r});
+    //MeasureTool.transform({a,b,c,d,e,f});
+    savedRotate.call(context, r);
+  }
 
 
-    const savedRestore = context.restore;
-    context.restore = () =>  {
-      savedRestore.call(context);
-      const {a,b,c,d,e,f} = context.getTransform();
-      MeasureTool.setTransform({a,b,c,d,e,f});
-      MeasureTool.addOp('restore', {a,b,c,d,e,f});
-    }
+  const savedRestore = context.restore;
+  context.restore = () =>  {
+    savedRestore.call(context);
+    const {a,b,c,d,e,f} = context.getTransform();
+    MeasureTool.setTransform({a,b,c,d,e,f});
+    MeasureTool.addOp('restore', {a,b,c,d,e,f});
+  }
 
-    const savedResetTransform = context.resetTransform;
-    context.resetTransform = () =>  {
-      MeasureTool.addOp('resetTransform', {});
-      savedResetTransform.call(context);
-      const {a,b,c,d,e,f} = context.getTransform();
-      MeasureTool.setTransform({a,b,c,d,e,f});
-    }
+  const savedResetTransform = context.resetTransform;
+  context.resetTransform = () =>  {
+    MeasureTool.addOp('resetTransform', {});
+    savedResetTransform.call(context);
+    const {a,b,c,d,e,f} = context.getTransform();
+    MeasureTool.setTransform({a,b,c,d,e,f});
+  }
 
 
   //
@@ -222,6 +225,8 @@
     console.log('Rendering completed');
 
   })();
+
+
 </script>
 
 </body>
