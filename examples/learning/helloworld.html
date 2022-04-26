@@ -64,7 +64,7 @@
 <br />
 
 <div id="div-container">
-  <canvas id="the-canvas" style="border: 1px solid red; direction: ltr; cursor: crosshair"></canvas>
+  <canvas id="the-canvas" style="border: 1px solid red; direction: ltr; cursor: crosshair; transform-origin: top left"></canvas>
 </div>
 <script src="measure-tool.js"></script>
 
@@ -74,9 +74,13 @@
 <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.3.2/dist/panzoom.min.js"></script>
 
 <script id="script">
+
   const canvas = document.getElementById("the-canvas");
   const context = canvas.getContext("2d");
+  const container = document.getElementById("div-container")
   canvas.addEventListener('mousemove', onMouseMove, false);
+  var wheelTimeoutHandler = null;
+  const wheelTimeout = 250 //ms
 
   const docs = [
     {url: './snap_line.pdf', page: 1},
@@ -86,7 +90,7 @@
     {url: './riverine.pdf', page: 5},
   ];
 
-  const doc = docs[3];
+  const doc = docs[4];
 
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
@@ -161,23 +165,31 @@
     MeasureTool.setTransform({a,b,c,d,e,f});
   }
 
-  const renderPdf = async (canvas, url, page_no, scale = 1) => {
+  const zoomWithWheel = (event) => {
+    panzoom.zoomWithWheel(event)
+    clearTimeout(wheelTimeoutHandler);
+    wheelTimeoutHandler = setTimeout(_ => {
+      canvas.style.transform = "scale("+1/panzoom.getScale()+")"
+      if (page) renderPage(canvas, page,  panzoom.getScale());
+      }, wheelTimeout
+    )
+  }
+
+
+  var renderInProgress = false;
+  const renderPage = async (canvas, page, scale = 1) => {
+    /*
     const loadingTask = pdfjsLib.getDocument(url);
     const pdf = await loadingTask.promise;
     const page = await pdf.getPage(page_no);
+    */
+
     const viewport = page.getViewport({ scale });
+
     // Support HiDPI-screens.
     const outputScale = window.devicePixelRatio || 1;
 
-    //
-    // Prepare canvas using PDF page dimensions
-    //
-    //const canvas = document.getElementById("the-canvas");
     const context = canvas.getContext("2d");
-
-    console.log('Initial transform is ', context.getTransform());
-
-
 
     MeasureTool.setContext(context);
 
@@ -201,7 +213,11 @@
       viewport,
     };
 
-    page.render(renderContext);
+    if(!renderInProgress) {
+      renderInProgress = true;
+      await page.render(renderContext);
+      renderInProgress = false;
+    }
 
     /*
     context.setTransform(transform);
@@ -211,7 +227,19 @@
 
   };
 
-  renderPdf(canvas, doc.url, doc.page);
+  var page;
+  var panzoom = Panzoom(container);
+
+  const main = async () => {
+    container.parentElement.addEventListener('wheel', zoomWithWheel, {passive: false})
+    const loadingTask = pdfjsLib.getDocument(doc.url);
+    const pdf = await loadingTask.promise;
+    page = await pdf.getPage(doc.page);
+    await renderPage(canvas, page)
+  }
+
+  main();
+  //renderPdf(canvas, doc.url, doc.page);
 
 
 </script>
