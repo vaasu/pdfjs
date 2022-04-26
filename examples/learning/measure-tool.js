@@ -76,6 +76,8 @@ class MeasureToolClass {
   getPoints     = _ => this.points;
   getOps        = _ => this.ops;
 
+  clearSnaps    = _ => this.points = [];
+
 }
 
 //const MeasureTool = new MeasureToolClass()

@@ -166,13 +166,15 @@
   }
 
   const zoomWithWheel = (event) => {
-    panzoom.zoomWithWheel(event)
+    panzoom.zoomWithWheel(event);
     clearTimeout(wheelTimeoutHandler);
     wheelTimeoutHandler = setTimeout(_ => {
       canvas.style.transform = "scale("+1/panzoom.getScale()+")"
-      if (page) renderPage(canvas, page,  panzoom.getScale());
-      }, wheelTimeout
-    )
+      if (page) {
+        MeasureTool.clearSnaps();
+        renderPage(canvas, page,  panzoom.getScale());
+      }
+    }, wheelTimeout);
   }
 
 
