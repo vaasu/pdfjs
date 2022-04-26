@@ -39,21 +39,6 @@ class MeasureToolClass {
     return {canSnap: false};
   }
 
-  transform_new_but_dont_use({a,b,c,d,e,f}){
-    // Multiply incoming x existing in this order
-    // Taken from https://www.wolframalpha.com/input?i=matrix+multiply&assumption=%7B%22F%22%2C+%22MatricesOperations%22%2C+%22theMatrix2%22%7D+-%3E%22%7B%7Ba_2%2Cc_2%2Ce_2%7D%2C%7Bb_2%2Cd_2%2Cf_2%7D%2C%7B0%2C0%2C1%7D%7D%22&assumption=%7B%22F%22%2C+%22MatricesOperations%22%2C+%22theMatrix1%22%7D+-%3E%22%7B%7Ba%2Cc%2Ce%7D%2C%7Bb%2Cd%2Cf%7D%2C%7B0%2C0%2C1%7D%7D%22
-    const [a2,b2,c2,d2,e2,f2] = this.currentMatrix;
-    const output = [
-      a*a2 + b2*c,
-      a2*b + b2*d,
-      a*c2 + c*d2,
-      b*c2 + d*d2,
-      a*e2 + c*f2+e,
-      b*e2 + d*f2+f
-    ]
-    this.currentMatrix = output;
-  }
-
   transform({a,b,c,d,e,f}){
     // Multiply current and incoming
     const [a1,b1,c1,d1,e1,f1] = this.currentMatrix;
