@@ -3,7 +3,6 @@ class MeasureToolClass {
   LIMIT_OPS = 0;
   points = [];
   ops = [];
-  //reverseTransform = [];
 
   // Default SVG matrix a,b,c,d,e
   currentMatrix = [1, 0, 0, 1, 0, 0]
@@ -22,7 +21,7 @@ class MeasureToolClass {
   {
     if(this.LIMIT_SNAPS > 0 && this.points.length > this.LIMIT_SNAPS) return;
     const [a,b,c,d,e,f] = this.currentMatrix;
-    // Transformed x and y
+    // Transformed x and y using matrix [x,y,1]
     let tx =  a * x + c * y + e;
     let ty  = b * x + d * y + f;
 
@@ -39,19 +38,6 @@ class MeasureToolClass {
     }
     return {canSnap: false};
   }
-
-  /*
-  saveTransform({a,b,c,d,e,f})
-  {
-    this.savedTransform = [a,b,c,d,e,f];
-
-    // Reverse got from Woframe
-    // https://www.wolframalpha.com/input?i=matrix+inverse&assumption=%7B%22F%22%2C+%22MatrixInverse%22%2C+%22invmatrix%22%7D+-%3E%22%7B%7Ba%2Cc%2Ce%7D%2C%7Bb%2Cd%2Cf%7D%2C%7B0%2C0%2C1%7D%7D%22&assumption=%7B%22C%22%2C+%22matrix+inverse%22%7D+-%3E+%7B%22Calculator%22%7D
-    this.reverseTransform = [
-      d/(a*d-b*c), b/(b*c-a*d), c/(b*c-a*d), a/(a*d-b*c), (d*e-c*f)/(b*c-a*d), (b*e-a*f)/(a*d-b*c)
-    ]
-  }
-  */
 
   transform_new_but_dont_use({a,b,c,d,e,f}){
     // Multiply incoming x existing in this order
