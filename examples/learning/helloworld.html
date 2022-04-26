@@ -168,10 +168,14 @@
   }
 
   const zoomWithWheel = (event) => {
+    console.log('Pan before zoom', panzoom.getPan());
+    const {px, py}= panzoom.getPan();
     panzoom.zoomWithWheel(event);
     clearTimeout(wheelTimeoutHandler);
     wheelTimeoutHandler = setTimeout(_ => {
       canvas.style.transform = "scale("+1/panzoom.getScale()+")"
+      //panzoom.pan(px, py);
+      console.log('Pan after zoom', panzoom.getPan());
       if (page) {
         MeasureTool.clearSnaps();
         renderPage(canvas, page,  panzoom.getScale());
@@ -236,6 +240,7 @@
 
   const main = async () => {
     container.parentElement.addEventListener('wheel', zoomWithWheel, {passive: false})
+    //container.parentElement.addEventListener('wheel', panzoom.zoomWithWheel, {passive: false})
     const loadingTask = pdfjsLib.getDocument(doc.url);
     const pdf = await loadingTask.promise;
     page = await pdf.getPage(doc.page);
